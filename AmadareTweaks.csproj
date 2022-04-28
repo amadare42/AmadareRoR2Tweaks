@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>AmadareTweaks</AssemblyName>
+    <Description>My first plugin</Description>
+    <Version>0.1.0</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <BuiltPluginDestPath></BuiltPluginDestPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.*" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
+    <PackageReference Include="MMHOOK.RoR2" Version="2022.4.19" />
+    <PackageReference Include="R2API" Version="4.3.21" />
+    <PackageReference Include="RiskOfRain2.GameLibs" Version="1.2.3.1-r.0" />
+    <PackageReference Include="UnityEngine.Modules" Version="2019.4.26" IncludeAssets="compile" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="RiskOfOptions">
+      <HintPath>libs\RiskOfOptions.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="manifest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="CopyCustomContent" AfterTargets="Build" Condition="$(BuiltPluginDestPath) != ''">
+    <ItemGroup>
+      <_FilesToCopy Include="$(OutputPath)*.dll" />
+    </ItemGroup>
+    <Message Text="Copying plugin files to '$(BuiltPluginDestPath)'" Importance="High" />
+    <Copy SourceFiles="@(_FilesToCopy)" DestinationFolder="$(BuiltPluginDestPath)" />
+  </Target>
+
+  <Target Name="ZipOutputPath" AfterTargets="Build" Condition=" '$(Configuration)' == 'Release' ">
+    <ZipDirectory SourceDirectory="$(OutputPath)" DestinationFile="$(OutputPath)\..\$(AssemblyName).zip" Overwrite="true" />
+  </Target>
+</Project>
